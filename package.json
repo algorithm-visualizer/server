@@ -1,0 +1,13 @@
+{
+  "name": "@algorithm-visualizer/server",
+  "version": "2.0.0",
+  "description": "Server for Algorithm Visualizer",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/algorithm-visualizer/server.git"
+  },
+  "license": "MIT"
+}

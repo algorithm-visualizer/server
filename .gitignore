@@ -1,0 +1,6 @@
+/.idea
+/node_modules
+/npm-debug.log
+/public
+/pm2.config.js
+.DS_Store
