@@ -1,7 +1,8 @@
 {
   "name": "@algorithm-visualizer/server",
   "version": "2.0.0",
-  "description": "Server for Algorithm Visualizer",
+  "title": "Algorithm Visualizer",
+  "description": "Algorithm Visualizer is an interactive online platform that visualizes algorithms from code.",
   "scripts": {
     "watch": "NODE_ENV=development NODE_PATH=src ts-node-dev --respawn --ignore-watch node_modules --no-notify src",
     "start": "NODE_ENV=production NODE_PATH=src ts-node --transpile-only src",
