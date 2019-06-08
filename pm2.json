@@ -1,0 +1,8 @@
+{
+  "apps": [
+    {
+      "name": "algorithm-visualizer",
+      "script": "npm start"
+    }
+  ]
+}
