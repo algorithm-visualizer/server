@@ -4,8 +4,7 @@ import { GitHubApi } from 'utils/apis';
 import { Algorithm, Category, File } from 'models';
 import { Author } from 'models/File';
 import { algorithmsDir } from 'config/paths';
-import { pull } from 'utils/misc';
-import execa from 'execa';
+import { execute, pull } from 'utils/misc';
 
 type CommitAuthors = {
   [sha: string]: Author,
@@ -52,7 +51,7 @@ export class Hierarchy {
 
   async cacheContributors(files: File[], commitAuthors: CommitAuthors) {
     for (const file of files) {
-      const stdout = await execa('git', ['--no-pager', 'log', '--follow', '--no-merges', '--format="%H"', '--', `"${file.path}"`], {
+      const stdout = await execute(`git --no-pager log --follow --no-merges --format="%H" -- "${path.relative(this.path, file.path)}"`, {
         cwd: this.path,
       });
       const output = stdout.toString().replace(/\n$/, '');

@@ -5,7 +5,7 @@ import uuid from 'uuid';
 import fs from 'fs-extra';
 import { memoryLimit, timeLimit } from 'config/constants';
 import { codesDir } from 'config/paths';
-import execa = require('execa');
+import { execute } from 'utils/misc';
 
 export class DockerTracer extends Tracer {
   private readonly directory: string;
@@ -21,7 +21,7 @@ export class DockerTracer extends Tracer {
 
   build(release: Release) {
     const {tag_name} = release;
-    return execa('docker', ['build', '-t', this.imageName, '.', '--build-arg', `tag_name=${tag_name}`], {cwd: this.directory});
+    return execute(`docker build -t ${this.imageName} . --build-arg tag_name=${tag_name}`, {cwd: this.directory});
   }
 
   route(router: express.Router) {
@@ -33,19 +33,19 @@ export class DockerTracer extends Tracer {
           const containerName = uuid.v4();
           let killed = false;
           const timer = setTimeout(() => {
-            execa('docker', ['kill', containerName]).then(() => {
+            execute(`docker kill ${containerName}`).then(() => {
               killed = true;
             });
           }, timeLimit);
-          return execa('docker', [
-            'run', '--rm',
+          return execute([
+            'docker run --rm',
             `--name=${containerName}`,
             '-w=/usr/visualization',
             `-v=${tempPath}:/usr/visualization:rw`,
             `-m=${memoryLimit}m`,
-            '-e', 'ALGORITHM_VISUALIZER=1',
+            '-e ALGORITHM_VISUALIZER=1',
             this.imageName,
-          ]).catch(error => {
+          ].join(' ')).catch(error => {
             if (killed) throw new Error('Time Limit Exceeded');
             throw error;
           }).finally(() => clearTimeout(timer));

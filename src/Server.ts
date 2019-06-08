@@ -8,10 +8,9 @@ import { __PROD__, credentials, httpPort, httpsPort, webhookOptions } from 'conf
 import http from 'http';
 import https from 'https';
 import { Hierarchy } from 'models';
-import execa from 'execa';
 import * as Tracers from 'tracers';
 import { errorHandlerMiddleware, frontendMiddleware, redirectMiddleware } from 'middlewares';
-import { pull } from 'utils/misc';
+import { execute, pull } from 'utils/misc';
 import { frontendBuildDir, frontendBuiltDir, frontendDir, rootDir } from 'config/paths';
 
 const Webhook = require('express-github-webhook');
@@ -76,13 +75,13 @@ export default class Server {
 
   async update(commit?: string) {
     await pull(rootDir, 'server', commit);
-    await execa.shell('npm install', {cwd: rootDir});
+    await execute('npm install', {cwd: rootDir});
     process.exit(0);
   };
 
   async updateFrontend(commit?: string) {
     await pull(frontendDir, 'algorithm-visualizer', commit);
-    await execa.shell([
+    await execute([
       'npm install',
       'npm run build',
       `rm -rf ${frontendBuiltDir}`,
