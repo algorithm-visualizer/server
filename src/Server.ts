@@ -31,7 +31,7 @@ export default class Server {
       .use('/api', this.getApiRouter())
       .use(frontendMiddleware(this));
     if (this.webhook) {
-      this.app.use('/webhook', this.webhook);
+      this.app.use(this.webhook);
     }
     this.app.use(errorHandlerMiddleware());
 
@@ -75,7 +75,11 @@ export default class Server {
 
   async update(commit?: string) {
     await pull(rootDir, 'server', commit);
-    await execute('npm install', {cwd: rootDir});
+    await execute('npm install', {
+      cwd: rootDir,
+      stdout: process.stdout,
+      stderr: process.stderr,
+    });
     process.exit(0);
   };
 
@@ -86,7 +90,11 @@ export default class Server {
       'npm run build',
       `rm -rf ${frontendBuiltDir}`,
       `mv ${frontendBuildDir} ${frontendBuiltDir}`,
-    ].join(' && '), {cwd: frontendDir});
+    ].join(' && '), {
+      cwd: frontendDir,
+      stdout: process.stdout,
+      stderr: process.stderr,
+    });
   }
 
   start() {

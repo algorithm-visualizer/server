@@ -8,7 +8,7 @@ export function errorHandlerMiddleware() {
       err = new InternalServerError(err.message, err);
     }
 
-    const {name, message, status} = err;
-    res.status(status).json({name, message, status});
+    const {message, status} = err;
+    res.status(status).send(message);
   };
 }

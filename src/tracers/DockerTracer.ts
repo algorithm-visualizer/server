@@ -21,7 +21,11 @@ export class DockerTracer extends Tracer {
 
   build(release: Release) {
     const {tag_name} = release;
-    return execute(`docker build -t ${this.imageName} . --build-arg tag_name=${tag_name}`, {cwd: this.directory});
+    return execute(`docker build -t ${this.imageName} . --build-arg tag_name=${tag_name}`, {
+      cwd: this.directory,
+      stdout: process.stdout,
+      stderr: process.stderr,
+    });
   }
 
   route(router: express.Router) {
