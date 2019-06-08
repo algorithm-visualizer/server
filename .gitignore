@@ -1,6 +1,16 @@
+# WebStorm settings
 /.idea
+
+# npm
 /node_modules
 /npm-debug.log
-/public
-/pm2.config.js
+
+# macOS
 .DS_Store
+
+# local .env* files
+.env.local
+.env.*.local
+
+# downloaded files
+/public
