@@ -18,7 +18,14 @@ Are you a first-timer in contributing to open source? [These guidelines](https:/
 
 3. Install [Docker](https://docs.docker.com/install/), if not done already.
 
-4. Install dependencies, and run the server.
+4. Create `.env.local` in the project root:
+    ```bash
+    GITHUB_CLIENT_ID = dummy
+    GITHUB_CLIENT_SECRET = dummy
+    ```
+    It's safe to put any dummy value to them unless you need the GitHub sign in functionality locally.
+
+5. Install dependencies, and run the server.
 
     ```bash
     cd server
@@ -28,7 +35,7 @@ Are you a first-timer in contributing to open source? [These guidelines](https:/
     npm run watch
     ```
     
-5. Open [`http://localhost:8080/`](http://localhost:8080/) in a web browser.
+6. Open [`http://localhost:8080/`](http://localhost:8080/) in a web browser.
 
 ## Directory Structure
 
