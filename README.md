@@ -6,4 +6,4 @@
 
 ## Contributing
 
-Check out the [contributing guidelines](https://github.com/algorithm-visualizer/algorithms/blob/master/CONTRIBUTING.md).
+Check out the [contributing guidelines](https://github.com/algorithm-visualizer/server/blob/master/CONTRIBUTING.md).
