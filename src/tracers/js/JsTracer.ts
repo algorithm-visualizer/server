@@ -20,7 +20,7 @@ export class JsTracer extends Tracer {
     router.get(`/${this.lang}`, (req, res) => {
       if (!this.tagName) throw new Error('JsTracer has not been built yet.');
       const version = this.tagName.slice(1);
-      res.redirect(`https://unpkg.com/algorithm-visualizer@${version}/dist/index.umd.js`);
+      res.redirect(`https://unpkg.com/algorithm-visualizer@${version}/dist/algorithm-visualizer.umd.js`);
     });
     router.get(`/${this.lang}/worker`, (req, res) => res.sendFile(this.workerPath));
   }
