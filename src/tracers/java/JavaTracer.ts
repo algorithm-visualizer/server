@@ -1,6 +1,6 @@
-import { DockerTracer } from 'tracers/DockerTracer';
+import { LambdaTracer } from 'tracers/LambdaTracer';
 
-export class JavaTracer extends DockerTracer {
+export class JavaTracer extends LambdaTracer {
   constructor() {
     super('java');
   }

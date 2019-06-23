@@ -20,10 +20,14 @@ Are you a first-timer in contributing to open source? [These guidelines](https:/
 
 4. Create `.env.local` in the project root:
     ```bash
+    # By putting dummy values, GitHub sign in will not work locally
     GITHUB_CLIENT_ID = dummy
     GITHUB_CLIENT_SECRET = dummy
+
+    # By putting dummy values, extracting visualizing commands will not work locally (except for JavaScript).
+    AWS_ACCESS_KEY_ID = dummy
+    AWS_SECRET_ACCESS_KEY = dummy
     ```
-    It's safe to put any dummy value to them unless you need the GitHub sign in functionality locally.
 
 5. Install dependencies, and run the server.
 
