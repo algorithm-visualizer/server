@@ -1,14 +1,10 @@
 import fs from 'fs';
 import { ServerOptions } from 'https';
 import path from 'path';
+import { spawn } from 'child_process';
+import { rootDir } from 'config/paths';
 
 require('dotenv-flow').config();
-
-declare var process: {
-  env: {
-    [key: string]: string,
-  }
-};
 
 const {
   NODE_ENV,
@@ -30,7 +26,9 @@ const {
 
   AWS_ACCESS_KEY_ID,
   AWS_SECRET_ACCESS_KEY,
-} = process.env;
+} = process.env as {
+  [key: string]: string,
+};
 
 const isEnabled = (v: string) => v === '1';
 
@@ -67,12 +65,30 @@ export const webhookOptions = isEnabled(WEBHOOK_ENABLED) ? {
   secret: WEBHOOK_SECRET,
 } : undefined;
 
-const readCredentials = (file: string) => fs.readFileSync(path.resolve(CREDENTIALS_PATH, file));
-export const credentials: ServerOptions | undefined = isEnabled(CREDENTIALS_ENABLED) ? {
-  ca: readCredentials(CREDENTIALS_CA),
-  key: readCredentials(CREDENTIALS_KEY),
-  cert: readCredentials(CREDENTIALS_CERT),
-} : undefined;
+export let credentials: ServerOptions | undefined;
+if (isEnabled(CREDENTIALS_ENABLED)) {
+  if (fs.existsSync(CREDENTIALS_PATH)) {
+    const readCredentials = (file: string) => fs.readFileSync(path.resolve(CREDENTIALS_PATH, file));
+    credentials = {
+      ca: readCredentials(CREDENTIALS_CA),
+      key: readCredentials(CREDENTIALS_KEY),
+      cert: readCredentials(CREDENTIALS_CERT),
+    };
+  } else {
+    const certbotIniPath = path.resolve(rootDir, 'certbot.ini');
+    const childProcess = spawn('certbot', ['certonly', '--non-interactive', '--agree-tos', '--config', certbotIniPath]);
+    childProcess.stdout.pipe(process.stdout);
+    childProcess.stderr.pipe(process.stderr);
+    childProcess.on('error', console.error);
+    childProcess.on('exit', code => {
+      if (code === 0) {
+        process.exit(0);
+      } else {
+        console.error(new Error(`certbot failed with exit code ${code}.`));
+      }
+    });
+  }
+}
 
 export const githubClientId = GITHUB_CLIENT_ID;
 export const githubClientSecret = GITHUB_CLIENT_SECRET;
