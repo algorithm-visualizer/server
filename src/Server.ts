@@ -4,9 +4,8 @@ import bodyParser from 'body-parser';
 import * as Controllers from 'controllers';
 import { NotFound } from 'ts-httpexceptions';
 import compression from 'compression';
-import { __PROD__, credentials, httpPort, httpsPort, webhookOptions } from 'config/environments';
+import { __PROD__, httpPort, webhookOptions } from 'config/environments';
 import http from 'http';
-import https from 'https';
 import { Hierarchy } from 'models';
 import * as Tracers from 'tracers';
 import { errorHandlerMiddleware, frontendMiddleware, redirectMiddleware } from 'middlewares';
@@ -101,11 +100,5 @@ export default class Server {
     const httpServer = http.createServer(this.app);
     httpServer.listen(httpPort);
     console.info(`http: listening on port ${httpPort}`);
-
-    if (credentials) {
-      const httpsServer = https.createServer(credentials, this.app);
-      httpsServer.listen(httpsPort);
-      console.info(`https: listening on port ${httpsPort}`);
-    }
   }
 }
