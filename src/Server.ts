@@ -4,20 +4,22 @@ import bodyParser from 'body-parser';
 import * as Controllers from 'controllers';
 import { NotFound } from 'ts-httpexceptions';
 import compression from 'compression';
-import { __PROD__, httpPort, webhookOptions } from 'config/environments';
+import { __PROD__, credentials, httpPort, httpsPort, webhookOptions } from 'config/environments';
 import http from 'http';
+import https from 'https';
+import cron from 'node-cron';
 import { Hierarchy } from 'models';
 import * as Tracers from 'tracers';
 import { errorHandlerMiddleware, frontendMiddleware, redirectMiddleware } from 'middlewares';
-import { execute, pull } from 'utils/misc';
+import { execute, issueHttpsCertificate, pull } from 'utils/misc';
 import { frontendBuildDir, frontendBuiltDir, frontendDir, rootDir } from 'config/paths';
 
 const Webhook = require('express-github-webhook');
 
 export default class Server {
-  private readonly app = express();
   readonly hierarchy = new Hierarchy();
   readonly tracers = Object.values(Tracers).map(Tracer => new Tracer());
+  private readonly app = express();
   private readonly webhook = webhookOptions && Webhook(webhookOptions);
 
   constructor() {
@@ -26,7 +28,7 @@ export default class Server {
       .use(morgan(__PROD__ ? 'tiny' : 'dev'))
       .use(redirectMiddleware())
       .use(bodyParser.json())
-      .use(bodyParser.urlencoded({extended: true}))
+      .use(bodyParser.urlencoded({ extended: true }))
       .use('/api', this.getApiRouter())
       .use(frontendMiddleware(this));
     if (this.webhook) {
@@ -36,7 +38,7 @@ export default class Server {
 
     if (this.webhook) {
       this.webhook.on('push', async (repo: string, data: any) => {
-        const {ref, head_commit} = data;
+        const { ref, head_commit } = data;
         if (ref !== 'refs/heads/master') return;
         if (!head_commit) throw new Error('The `head_commit` is empty.');
 
@@ -59,6 +61,12 @@ export default class Server {
         const tracer = this.tracers.find(tracer => repo === `tracers.${tracer.lang}`);
         if (!tracer) throw new Error(`Tracer not found for repository '${repo}'.`);
         await tracer.update(data.release);
+      });
+    }
+
+    if (credentials) {
+      cron.schedule('0 0 1 * *', () => {
+        issueHttpsCertificate();
       });
     }
   }
@@ -100,5 +108,11 @@ export default class Server {
     const httpServer = http.createServer(this.app);
     httpServer.listen(httpPort);
     console.info(`http: listening on port ${httpPort}`);
+
+    if (credentials) {
+      const httpsServer = https.createServer(credentials, this.app);
+      httpsServer.listen(httpsPort);
+      console.info(`https: listening on port ${httpsPort}`);
+    }
   }
 }
